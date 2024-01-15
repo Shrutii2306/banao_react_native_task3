@@ -1,31 +1,23 @@
 import React, { useState } from 'react';
 import {View, Text,StyleSheet, Image, TextInput, Button, KeyboardAvoidingView} from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { FIREBASE_AUTH } from '../firebaseConfig';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../firebaseConfig';
 import { addDoc, collection,getDoc } from "firebase/firestore"; 
 const Login = ({navigation}) => {
 
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const auth = FIREBASE_AUTH;
-
+    const db = FIREBASE_DB;
 const signIn = async() => {
 
     setLoading(true);
     try{
-        const response = await signInWithEmailAndPassword(auth,userName,password);
+        const response = await signInWithEmailAndPassword(auth,email,password);
         //alert('Check your emails!');
-        try{
-            const userResponse = await addDoc(collection(db,"users"),{
-                userName : userName,
-                password : password,
-            });
-            console.log("user created successfuly!");
-            navigation.navigate('Home');
-        }catch(err){
-            console.log("cannot store in fireStore",err.message);
-        }
+         navigation.navigate('Home');
         //
 
     }catch(error){
@@ -40,13 +32,22 @@ const signIn = async() => {
 const signUp = async() =>{
     setLoading(true);
     try{
-        const response = await createUserWithEmailAndPassword(auth, userName, password);
+        const response = await createUserWithEmailAndPassword(auth, email, password);
         console.log(response);
-        alert('Check your userNames!');
+        try{
+            const userResponse = await addDoc(collection(db,"users"),{
+                uid : response.uid,
+                userName : userName,
+            });
+            console.log("user created successfuly!");
+            navigation.navigate('Home');
+        }catch(err){
+            console.log("cannot store in fireStore",err.message);
+        }
         
     }catch(error){
         console.log(error);
-        alert('Sign in falied : '+ error.message);
+        alert('Sign up falied : '+ error);
         
     }finally{
         setLoading(false);
@@ -56,10 +57,17 @@ const signUp = async() =>{
         <View style={styles.container}>
         <KeyboardAvoidingView behavior='padding'>
             <Text>login</Text>
-            <TextInput style={styles.input} placeholder='userName'
-            value={userName}
-            onChangeText={(userName) => setUserName(userName)}
+            <TextInput style={styles.input} placeholder='email'
+            value={email}
+            onChangeText={(email) => setEmail(email)}
             autoCapitalize='none'/>
+            <TextInput 
+                style={styles.input}
+                placeholder='username'
+                value={userName}
+                onChangeText={(userName) => setUserName(userName)}
+                autoCapitalize='none'
+            />
             <TextInput
             style={styles.input}
             placeholder='password'
