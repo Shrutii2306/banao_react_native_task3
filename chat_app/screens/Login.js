@@ -11,6 +11,7 @@ const Login = ({navigation}) => {
     const [loading, setLoading] = useState(false);
     const auth = FIREBASE_AUTH;
     const db = FIREBASE_DB;
+
 const signIn = async() => {
 
     setLoading(true);
@@ -33,10 +34,10 @@ const signUp = async() =>{
     setLoading(true);
     try{
         const response = await createUserWithEmailAndPassword(auth, email, password);
-        console.log(response);
+        console.log(response.user.uid);
         try{
             const userResponse = await addDoc(collection(db,"users"),{
-                uid : response.uid,
+                uid : response.user.uid,
                 userName : userName,
             });
             console.log("user created successfuly!");
