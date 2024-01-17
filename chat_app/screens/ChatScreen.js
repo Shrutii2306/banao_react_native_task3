@@ -2,7 +2,7 @@ import {getAuth } from 'firebase/auth';
 import React, { useEffect ,useState} from 'react';
 import {View, StyleSheet, Text, TextInput, Button, FlatList, TouchableOpacity, ToastAndroid} from 'react-native';
 import { FIREBASE_DB } from '../firebaseConfig';
-import {doc,getDocs,query,where,documentId,setDoc,getDoc, collection, Timestamp, addDoc, orderBy } from 'firebase/firestore';
+import {doc,getDocs,query,where,documentId,setDoc,getDoc, collection, Timestamp, addDoc, orderBy, serverTimestamp, updateDoc, increment, writeBatch } from 'firebase/firestore';
 import { logEvent } from 'firebase/analytics';
 
 const ChatScreen = ({route}) => {
@@ -13,11 +13,13 @@ const ChatScreen = ({route}) => {
     const {id,type }= route.params;
     const docId = currentUid+'_'+id;
     const docId2 = id+'_'+currentUid;
-    console.log('id',docId)
-    console.log('id2',docId2)
+    // console.log('id',docId)
+    // console.log('id2',docId2)
     const [chatWindowID, setChatWindowID] = useState('');
     const [message, setMessage] = useState('');
     const [allMessages, setAllMessages] = useState([]);
+    // const [sender,setSender] = useState('');
+    // const [receiver,setReceiver] = useState('');
     const createDB = async() => {
 
         console.log("inside createDB");
@@ -29,6 +31,7 @@ const ChatScreen = ({route}) => {
             
         });
         console.log("new doc id",docRef.id);
+        
     }
     
     const getDB = async() => {
@@ -77,12 +80,46 @@ const ChatScreen = ({route}) => {
        const messageData = {
         sender : currentUid,
         receiver : id,
-        timeStamp : new Date(),
+        timeStamp : serverTimestamp(),
         message : message
        };
 
        const res = await addDoc(docRef,messageData);
+       console.log('message saved')
+       //updating latest time stamp
+       const chatWindowRef = doc(db, "messagesDB",chatWindowID);
+       await updateDoc(chatWindowRef,{
+        message_count : increment(1),
+        latestTimeStamp: serverTimestamp()
+       });
+    console.log('message db updated');
+       //updating latest time stamp for user
+    //    const senderWindowRef =doc(db, "users", where('uid','==', currentUid));
+
+    //    await updateDoc(senderWindowRef,{
+       
+    //     lastText: serverTimestamp()
+    //    });
+
+    //    console.log('sender updated')
+    //    const receiverWindowRef = doc(db, "users",where('uid','==', id));
+
+    //    await updateDoc(receiverWindowRef,{
+       
+    //     lastText: serverTimestamp()
+    //    });
+    //     console.log(activeUsers);
+    //     const batch = writeBatch(db);
+    //     const senderRef = doc(db,'users',where('uid','==',currentUid));
+    //     batch.update(senderRef,{
+    //         lastText : serverTimestamp()
+    //     })
+    //    await batch.commit(;
+
+    // 
+    
        console.log("message created using id :",res.id);
+       getMessageCollection();
        setMessage('');
     }catch(err){
         console.log(err.message);
@@ -94,10 +131,11 @@ const ChatScreen = ({route}) => {
     try
     {
         console.log('first');
-        const q= query(collection(db, "messagesDB",chatWindowID,'messages',orderBy('timeStamp')));
+        const docRef = collection(db, "messagesDB",chatWindowID,'messages')
+        const q= query(docRef, orderBy('timeStamp'));
         let messagesRes = [];
-        const querySnapshot = await getDocs(q);
-            console.log(querySnapshot);
+        const querySnapshot = await getDocs(q,orderBy("timeStamp"));
+            console.log('querySnapshot',querySnapshot);
         querySnapshot.forEach((doc) => {
             //console.log(doc.id, " => ", doc.data());
             //setChatWindowID(doc.id);
@@ -126,12 +164,12 @@ const ChatScreen = ({route}) => {
     },[]);
     return (
         <View style={styles.container}>
-             <Text>{currentUid}{id}</Text>
+             <Text>{currentUid} {id}</Text>
             
             <FlatList 
                 data={allMessages}
                 renderItem={({item}) => (
-                    <TouchableOpacity>
+                    <TouchableOpacity style={item.sender==currentUid? styles.senderContainer : styles.receiverContainer}>
                        <Text>{item.message}</Text> 
                     </TouchableOpacity>
                 )}
@@ -151,6 +189,9 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         marginHorizontal:20,
         marginTop:100,
+    },
+    senderContainer:{
+        borderWidth:2
     }
 })
 
