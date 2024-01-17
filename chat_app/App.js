@@ -12,7 +12,16 @@ export default function App() {
 
   const [user, setUser] = useState(null);
 
-
+const InsideLayout = () =>{
+  return(
+    <Stack.Navigator initialRouteName='Home'>
+     
+      <Stack.Screen name='Home' component={HomeScreen} options={{headerShown:false}}/>
+         <Stack.Screen name='Chat' component={ChatScreen} options={{headerShown: false}}/>
+ 
+    </Stack.Navigator>
+  )
+}
  useEffect(() => {
 
     onAuthStateChanged(FIREBASE_AUTH,(user) =>{
@@ -23,9 +32,11 @@ export default function App() {
   return(
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'>
-        <Stack.Screen name='Login' component={Login} options={{headerShown:false}}/>
-        <Stack.Screen name='Home' component={HomeScreen} options={{headerShown:false}}/>
-        <Stack.Screen name='Chat' component={ChatScreen} options={{headerShown: false}}/>
+        {user ?  (<Stack.Screen name='Login' component={InsideLayout} options={{headerShown:false}}/>):
+         (<Stack.Screen name='Login' component={Login} options={{headerShown:false}}/>)       
+        }
+        
+       
       </Stack.Navigator>
     </NavigationContainer>
   )
