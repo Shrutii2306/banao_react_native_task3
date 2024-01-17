@@ -71,7 +71,7 @@ const HomeScreen = ({navigation}) => {
                 data={userList}
                 renderItem={({item}) =>(
 
-                    <TouchableOpacity style={{height:50,borderWidth:2}} onPress={() => navigation.navigate('Chat',{id:item.uid})}>
+                    <TouchableOpacity style={{height:50,borderWidth:2}} onPress={() => navigation.navigate('Chat',{id:item.uid,type : item.type})}>
                         <Text>
                             {item.type=='individual'?item.userName:item.name}
                         </Text>
@@ -80,7 +80,7 @@ const HomeScreen = ({navigation}) => {
                 keyExtractor={item=> item.uid}
             />   : null
             }       
-            <Button title='Chat' onPress={() => navigation.navigate('Chat')}/>
+            <Button title='Chat' onPress={() => auth.signOut()}/>
         </SafeAreaView>
     );
 }
