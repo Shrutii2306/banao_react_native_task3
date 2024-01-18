@@ -66,6 +66,8 @@ const ChatScreen = ({route}) => {
         }
 
     }
+
+
     const getMessageCollection = async() => {
 
         setLoading(true);
@@ -125,10 +127,11 @@ const ChatScreen = ({route}) => {
        });
     console.log('message db updated');
        //updating latest time stamp for user
-      updateUserID();
+      
 
        console.log("message created using id :",res.id);
        getMessageCollection();
+       updateUserID();
        setMessage('');
     }catch(err){
         console.log(err.message);
@@ -139,35 +142,43 @@ const updateUserID = async() => {
 
     try{
         console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        const userRef2 = collection(db, 'users');
-        const q = query(userRef2,where('uid','in',[currentUid,id]))
-        const userSnapshot = await getDocs(q);
-        userSnapshot.forEach((doc) => {
+        const senderRef = doc(db, 'userConnections','userConnections',currentUid,id);
+         await updateDoc(senderRef,{
+            lastText : serverTimestamp()
+         });
+
+         const receiverRef = doc(db, 'userConnections','userConnections',id,currentUid);
+         await updateDoc(receiverRef,{
+            lastText : serverTimestamp()
+         });
+        // const q = query(userRef2,where('uid','==',id))
+        // const userSnapshot = await getDocs(q);
+        // userSnapshot.forEach((doc) => {
  
-         console.log(doc.id ,'=====>',doc.data());
-         if(doc.data().uid == currentUid)
-         {
-             setSender(doc.id);
-         }
-         if(doc.data().uid == id){
-             setReceiver(doc.id);
-         }
-        })
-        try{
+        //  console.log(doc.id ,'=====>',doc.data());
+        //  if(doc.data().uid == currentUid)
+        //  {
+        //      setSender(doc.id);
+        //  }
+        //  if(doc.data().uid == id){
+        //      setReceiver(doc.id);
+        //  }
+        // })
+        // try{
 
-            const senderRef = doc(db,'users',senderID);
-            await updateDoc(senderRef,{
-                lastText : serverTimestamp()
-            })  
-            const receiverRef = doc(db, 'users',receiverID);
-            await updateDoc(receiverRef,{
-                lastText : serverTimestamp()
-            })
+        //     const senderRef = doc(db,'users',senderID);
+        //     await updateDoc(senderRef,{
+        //         lastText : serverTimestamp()
+        //     })  
+        //     const receiverRef = doc(db, 'users',receiverID);
+        //     await updateDoc(receiverRef,{
+        //         lastText : serverTimestamp()
+        //     })
 
-            console.log('user db ')
-        }catch(err){
-            console.log(err.message);
-        }
+        //     console.log('user db ')
+        // }catch(err){
+        //     console.log(err.message);
+        // }
     }catch(err){
         console.log(err.message);
     }

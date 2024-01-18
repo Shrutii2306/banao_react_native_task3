@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {View, StyleSheet, Text, Button, TouchableOpacity, FlatList, SafeAreaView} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native'
 import { collection,get, doc ,getDocs, query, onSnapshot, where, orderBy } from "firebase/firestore"; 
 import { FIREBASE_DB } from '../firebaseConfig';
 import { getAuth } from 'firebase/auth';
@@ -31,10 +32,26 @@ const HomeScreen = ({navigation}) => {
         // })
         // return() => subscriber();
         try{
-            console.log('inside userrrrrrrr');
-            const userRef =(collection(db,"users"))
-            const q = query(userRef,orderBy('lastText','desc'))
-            const querySnapshot = await getDocs(q);
+            // console.log('inside userrrrrrrr');
+            // const userRef =(collection(db,"users"))
+            // const q = query(userRef,orderBy('lastText','desc'))
+            // const querySnapshot = await getDocs(q);
+            // console.log("querySnapshot",querySnapshot);
+            // querySnapshot.forEach((doc) => {
+            //     console.log(doc.id,"=>",doc.data());
+            //     if(userID!= doc.data().uid)
+            //     newUserList.push(doc.data())
+            // });
+            // setUserList(newUserList);
+            // console.log("userList : ",userList);
+            // userList.forEach((item) =>{
+            //     console.log(item)
+            // })
+           //console.log("user 1 : ",userList[0].type);
+           console.log('inside user');
+           const userRef = (collection(db,'userConnections','userConnections',userID))
+           const q = query(userRef,orderBy('lastText','desc'))
+           const querySnapshot = await getDocs(q);
             console.log("querySnapshot",querySnapshot);
             querySnapshot.forEach((doc) => {
                 console.log(doc.id,"=>",doc.data());
@@ -46,7 +63,8 @@ const HomeScreen = ({navigation}) => {
             userList.forEach((item) =>{
                 console.log(item)
             })
-           //console.log("user 1 : ",userList[0].type);
+
+
            setLoading(false);
            }catch(err){
             console.log(err.message);
@@ -57,8 +75,19 @@ const HomeScreen = ({navigation}) => {
 
     useEffect(() => {
 
+        console.log('inside useffect');
         getUsers();
     },[]);
+    // useEffect(() => {
+    //     const unsubscribe = navigation.addListener('focus', () => {
+    //       // The screen is focused
+    //       // Call any action and update data
+    //       getUsers();
+    //     });
+    
+    //     // Return the function to unsubscribe from the event so it gets removed on unmount
+    //     return unsubscribe;
+    //   }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>
