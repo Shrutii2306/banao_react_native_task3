@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import {View, Text,StyleSheet, Image, TextInput, Button, KeyboardAvoidingView} from 'react-native';
+import {View, Text,StyleSheet, Image, TextInput, KeyboardAvoidingView} from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { FIREBASE_AUTH, FIREBASE_DB } from '../firebaseConfig';
 import { addDoc, collection,getDoc } from "firebase/firestore"; 
+
+import { Input, Icon } from '@rneui/themed';
+import { Button } from '@rneui/base';
 const Login = ({navigation}) => {
 
     const [userName, setUserName] = useState('');
@@ -57,27 +60,34 @@ const signUp = async() =>{
     return (
         <View style={styles.container}>
         <KeyboardAvoidingView behavior='padding'>
-            <Text>login</Text>
-            <TextInput style={styles.input} placeholder='email'
+            <Text style={{fontWeight:'bold',fontSize:40}}>Login</Text>
+            <Input  placeholder='email'
             value={email}
             onChangeText={(email) => setEmail(email)}
             autoCapitalize='none'/>
-            <TextInput 
-                style={styles.input}
-                placeholder='username'
-                value={userName}
-                onChangeText={(userName) => setUserName(userName)}
-                autoCapitalize='none'
-            />
-            <TextInput
-            style={styles.input}
+           
+            <Input
             placeholder='password'
             value={password}
             secureTextEntry={true}
             onChangeText={(password) => setPassword(password)}            
             />
-            <Button title='login' onPress={signIn}/>
-            <Button title='Create Account' onPress={signUp}/>
+             <Button
+              title="Login"
+              loading={false}
+              loadingProps={{ size: 'small', color: 'white' }}
+              buttonStyle={{
+                backgroundColor: 'rgba(111, 202, 186, 1)',
+                borderRadius: 5,
+              }}
+              titleStyle={{ fontSize: 18 }}
+              containerStyle={{
+                marginHorizontal: 73,
+                height: 40,
+                width: 150,
+                marginVertical: 5,
+              }} onPress={signIn}/>
+           
             </KeyboardAvoidingView>
         </View>
     );

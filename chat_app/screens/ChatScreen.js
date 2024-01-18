@@ -83,7 +83,8 @@ const ChatScreen = ({route}) => {
             const querySnapshot = await getDocs(q,orderBy("timeStamp"));
                 console.log('querySnapshot',querySnapshot);
             querySnapshot.forEach((doc) => {
-    
+                
+                console.log(doc.data());
                 messagesRes.push(doc.data());
             });
             console.log('messagesssssss',messagesRes);
@@ -197,14 +198,14 @@ const updateUserID = async() => {
         <View style={styles.container}>
              <Text style={{fontWeight:'bold',fontSize:20}}> {userName}</Text>
             
-           {!loading? <FlatList 
+         <FlatList 
                 data={allMessages}
                 renderItem={({item}) => (
                     <TouchableOpacity style={item.sender==currentUid? styles.senderContainer : styles.receiverContainer}>
                        <Text>{item.message}</Text> 
                     </TouchableOpacity>
                 )}
-            />: null}
+            />
             <Input value={message} placeholder='Enter text to send' onChangeText={(message) => setMessage(message)}/>
             {/* <TextInput value={message} placeholder='Enter text to send' onChangeText={(message) => setMessage(message)}
             /> */}
@@ -216,12 +217,12 @@ const updateUserID = async() => {
                 backgroundColor: 'rgba(111, 202, 186, 1)',
                 borderRadius: 5,
               }}
-              titleStyle={{ fontWeight: 'bold', fontSize: 20 }}
+              titleStyle={{ fontSize: 18 }}
               containerStyle={{
-                marginHorizontal: 40,
+                marginHorizontal: 73,
                 height: 40,
-                width: 200,
-                marginVertical: 10,
+                width: 150,
+                marginVertical: 5,
               }} onPress={addMessageCollection}/>
         </View>
     );
@@ -236,8 +237,24 @@ const styles = StyleSheet.create({
         marginTop:70,
     },
     senderContainer:{
-        borderWidth:2,
-        backgroundColor:'green'
+        
+        backgroundColor:'#B2D1B8',
+        height:40,
+        justifyContent : 'center',
+        paddingHorizontal :10,
+        borderRadius :20,
+        marginVertical: 5,
+        
+    },
+    receiverContainer:{
+        
+        backgroundColor:'#EEEED4',
+        height:40,
+        justifyContent : 'center',
+        paddingHorizontal :10,
+        borderRadius :20,
+        marginVertical: 5,
+        
     }
 })
 

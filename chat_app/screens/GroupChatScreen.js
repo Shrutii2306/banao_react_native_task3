@@ -1,9 +1,11 @@
 import { getAuth } from 'firebase/auth';
 import {serverTimestamp,addDoc,updateDoc,increment,orderBy, collection,where,documentId, query,getDocs,doc,setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import {View,ToastAndroid, StyleSheet, Text, Button, TextInput,FlatList,TouchableOpacity} from 'react-native';
+import {View,ToastAndroid, StyleSheet, Text,TextInput,FlatList,TouchableOpacity} from 'react-native';
 import { FIREBASE_DB } from '../firebaseConfig';
 
+import { Input, Icon } from '@rneui/themed';
+import { Button } from '@rneui/base';
 const GroupChatScreen = ({route}) => {
 
     const auth = getAuth();
@@ -12,7 +14,7 @@ const GroupChatScreen = ({route}) => {
     const {id,type} = route.params;
     const [loading, setLoading] = useState(false);
     const [chatWindowID, setChatWindowID] = useState('');
-    //console.log(currentUid,';;;;;',id);
+   
     const db = FIREBASE_DB;
     const [currentUser,setCurrentUser] =useState([])
     const [user1,setUser1] =useState([])
@@ -191,36 +193,7 @@ const GroupChatScreen = ({route}) => {
     const updateUserID = async() => {
 
         try{
-            console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-            // const userRef2 = collection(db, 'users');
-            // const q = query(userRef2,where('uid','in',[currentUid,user1[0],user2[0]]))
-            // const userSnapshot = await getDocs(q);
-            // let sen = [];
-            // userSnapshot.forEach((doc) => {
-     
-            //  console.log(doc.id ,'=====>',doc.data());
-            //  if(doc.data().uid == currentUid)
-            //  {
-            //      setSender(doc.id);
-            //  }
-            //  if(doc.data().uid == user1[0]){
-            //      sen.push(doc.data().uid)
-            //  }
-            //  if(doc.data().uid == user2[0]){
-            //     sen.push(doc.data().uid)
-            // }
-            // })
-            // setSender(sen);
-            // try{
-    
-                // const senderRef = doc(db,'users',id);
-                // await updateDoc(senderRef,{
-                //     lastText : serverTimestamp()
-                // })  
-                // const receiverRef = doc(db, 'users',receivers[0]);
-                // await updateDoc(receiverRef,{
-                //     lastText : serverTimestamp()
-                // })
+            
                 const user1Ref = doc(db, 'userConnections','userConnections',currentUid,id);
                 await updateDoc(user1Ref,{
                     lastText : serverTimestamp()
@@ -252,21 +225,33 @@ const GroupChatScreen = ({route}) => {
 
     return (
         <View style={styles.container}>
-            <Text>Group chat</Text>
-           {!loading? <View>{console.log(currentUser)}<Text>{currentUser[1]}</Text>
-            <Text>{user1[1]}</Text>
-            <Text>{user2[1]}</Text></View>: null}
+           <Text style={{fontWeight:'bold',fontSize:20}}> Group Chat</Text>
 
-            {!loading? <FlatList 
+            <FlatList 
                 data={allMessages}
                 renderItem={({item}) => (
                     <TouchableOpacity style={item.sender==currentUid? styles.senderContainer : styles.receiverContainer}>
                        <Text>{item.message}</Text> 
                     </TouchableOpacity>
                 )}
-            />: null}
-            <TextInput value={message} placeholder='Enter text to send...' onChangeText={(message) => setMessage(message)}/>
-            <Button title='Send' onPress={addMessageCollection}/>
+            />
+              <Input value={message} placeholder='Enter text to send' onChangeText={(message) => setMessage(message)}/>
+            {/* <TextInput value={message} placeholder='Enter text to send...' onChangeText={(message) => setMessage(message)}/> */}
+            <Button
+              title="Send"
+              loading={false}
+              loadingProps={{ size: 'small', color: 'white' }}
+              buttonStyle={{
+                backgroundColor: 'rgba(111, 202, 186, 1)',
+                borderRadius: 5,
+              }}
+              titleStyle={{ fontSize: 18 }}
+              containerStyle={{
+                marginHorizontal: 73,
+                height: 40,
+                width: 150,
+                marginVertical: 5,
+              }} onPress={addMessageCollection}/>
         </View>
     );
 }
@@ -276,11 +261,28 @@ const styles = StyleSheet.create({
     container:{
 
         flex:1,
-       
-        marginHorizontal:20
+        marginHorizontal:20,
+        marginTop:70,
     },
     senderContainer:{
-        borderWidth:2
+        
+        backgroundColor:'#B2D1B8',
+        height:40,
+        justifyContent : 'center',
+        paddingHorizontal :10,
+        borderRadius :20,
+        marginVertical: 5,
+        
+    },
+    receiverContainer:{
+        
+        backgroundColor:'#EEEED4',
+        height:40,
+        justifyContent : 'center',
+        paddingHorizontal :10,
+        borderRadius :20,
+        marginVertical: 5,
+        
     }
 })
 

@@ -67,13 +67,13 @@ const HomeScreen = ({navigation}) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text>Home</Text>
+            <Text style={{fontWeight:'bold',fontSize:20}}>Home</Text>
             <Text>
                 {userList.map((item,index) => {
                     <Text key={index}>{item.uid}</Text>
                 })}
             </Text>
-           {!loading? <FlatList 
+            <FlatList 
 
                 data={userList}
                 renderItem={({item}) =>(
@@ -85,8 +85,7 @@ const HomeScreen = ({navigation}) => {
                     </TouchableOpacity>
     )}      
                 keyExtractor={item=> item.uid}
-            />   : null
-            }       
+            />        
               <Button
               title="Log out"
               loading={false}
