@@ -8,6 +8,7 @@ const GroupChatScreen = ({route}) => {
 
     const auth = getAuth();
     const currentUid =auth.currentUser.uid;
+    
     const {id,type} = route.params;
     const [loading, setLoading] = useState(false);
     const [chatWindowID, setChatWindowID] = useState('');
@@ -212,15 +213,28 @@ const GroupChatScreen = ({route}) => {
             // setSender(sen);
             // try{
     
-                const senderRef = doc(db,'users',id);
-                await updateDoc(senderRef,{
-                    lastText : serverTimestamp()
-                })  
+                // const senderRef = doc(db,'users',id);
+                // await updateDoc(senderRef,{
+                //     lastText : serverTimestamp()
+                // })  
                 // const receiverRef = doc(db, 'users',receivers[0]);
                 // await updateDoc(receiverRef,{
                 //     lastText : serverTimestamp()
                 // })
-    
+                const user1Ref = doc(db, 'userConnections','userConnections',currentUid,id);
+                await updateDoc(user1Ref,{
+                    lastText : serverTimestamp()
+                 });
+                 
+                 const user2Ref = doc(db, 'userConnections','userConnections',user1[0],id);
+                await updateDoc(user2Ref,{
+                    lastText : serverTimestamp()
+                 });
+
+                 const user3Ref = doc(db, 'userConnections','userConnections',user2[0],id);
+                await updateDoc(user3Ref,{
+                    lastText : serverTimestamp()
+                 });
                 console.log('user db ')
             // }catch(err){
             //     console.log(err.message);
@@ -262,7 +276,7 @@ const styles = StyleSheet.create({
     container:{
 
         flex:1,
-        justifyContent:'center',
+       
         marginHorizontal:20
     },
     senderContainer:{

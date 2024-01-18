@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {View,Alert,BackHandler, StyleSheet, Text, Button, TouchableOpacity, FlatList, SafeAreaView} from 'react-native';
+import {View,Alert,BackHandler, StyleSheet, Text, TouchableOpacity, FlatList, SafeAreaView} from 'react-native';
 import {useFocusEffect,useIsFocused} from '@react-navigation/native'
 import { collection,get, doc ,getDocs, query, onSnapshot, where, orderBy } from "firebase/firestore"; 
 import { FIREBASE_DB } from '../firebaseConfig';
 import { getAuth } from 'firebase/auth';
-
+import { Button } from '@rneui/base';
 const HomeScreen = ({navigation}) => {
 
     const auth = getAuth();
@@ -13,41 +13,14 @@ const HomeScreen = ({navigation}) => {
     const [userList, setUserList] = useState([]);
     const [loading, setLoading] = useState(false);
     let newUserList = [];
+    const [activeChat, setActiveChat] = useState('');
     const getUsers = async() =>
     {
         setLoading(true);
         
-        // const userRef = collection(FIREBASE_DB, 'users');
-        // const subscriber = onSnapshot(userRef,{
-        //     next: (snapshot) =>{
-        //         const users =[];
-        //         snapshot.docs.forEach(doc => {
-        //             console.log(doc);
-        //             users.push({
-        //                 ...doc.data(),
-        //             })
-        //         })
-        //         setUserList(users);
-        //     }
-        // })
-        // return() => subscriber();
+       
         try{
-            // console.log('inside userrrrrrrr');
-            // const userRef =(collection(db,"users"))
-            // const q = query(userRef,orderBy('lastText','desc'))
-            // const querySnapshot = await getDocs(q);
-            // console.log("querySnapshot",querySnapshot);
-            // querySnapshot.forEach((doc) => {
-            //     console.log(doc.id,"=>",doc.data());
-            //     if(userID!= doc.data().uid)
-            //     newUserList.push(doc.data())
-            // });
-            // setUserList(newUserList);
-            // console.log("userList : ",userList);
-            // userList.forEach((item) =>{
-            //     console.log(item)
-            // })
-           //console.log("user 1 : ",userList[0].type);
+          
            console.log('inside user');
            const userRef = (collection(db,'userConnections','userConnections',userID))
            const q = query(userRef,orderBy('lastText','desc'))
@@ -90,20 +63,11 @@ const HomeScreen = ({navigation}) => {
           return () => backHandler.remove();
         
     },[userList]);
-    // useEffect(() => {
-    //     const unsubscribe = navigation.addListener('focus', () => {
-    //       // The screen is focused
-    //       // Call any action and update data
-    //       getUsers();
-    //     });
-    
-    //     // Return the function to unsubscribe from the event so it gets removed on unmount
-    //     return unsubscribe;
-    //   }, [navigation]);
+   
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text>HomeScreen</Text>
+            <Text>Home</Text>
             <Text>
                 {userList.map((item,index) => {
                     <Text key={index}>{item.uid}</Text>
@@ -114,7 +78,7 @@ const HomeScreen = ({navigation}) => {
                 data={userList}
                 renderItem={({item}) =>(
 
-                    <TouchableOpacity style={{height:50,borderWidth:2}} onPress={item.type=='individual'?() => navigation.navigate('Chat',{id:item.uid,type : item.type}): () =>navigation.navigate('GroupChat',{id:item.uid,type : item.type})}>
+                    <TouchableOpacity style={styles.userList} onPress={item.type=='individual'?() => navigation.navigate('Chat',{id:item.uid,type : item.type, userName : item.userName}): () =>navigation.navigate('GroupChat',{id:item.uid,type : item.type, userName : item.name})}>
                         <Text>
                             {item.type=='individual'?item.userName:item.name}
                         </Text>
@@ -123,7 +87,24 @@ const HomeScreen = ({navigation}) => {
                 keyExtractor={item=> item.uid}
             />   : null
             }       
-            <Button title='Chat' onPress={() => auth.signOut()}/>
+              <Button
+              title="Log out"
+              loading={false}
+              loadingProps={{ size: 'small', color: 'white' }}
+              buttonStyle={{
+                backgroundColor: 'rgba(111, 202, 186, 1)',
+                borderRadius: 5,
+              }}
+              titleStyle={{ fontWeight: 'bold', fontSize: 23 }}
+              containerStyle={{
+                marginHorizontal: 50,
+                height: 50,
+                width: 200,
+                marginVertical: 10,
+              }}
+              onPress={() => auth.signOut()}
+            />
+            
         </SafeAreaView>
     );
 }
@@ -136,8 +117,18 @@ const styles = StyleSheet.create({
 
         flex:1,
         marginHorizontal:20,
-        justifyContent:'center',
         paddingTop:50
+    },
+    userList:{
+
+        height:50,
+        borderWidth:1,
+        borderColor:'gray',
+        borderRadius:30,
+        justifyContent:'center',
+        marginVertical: 10,
+        paddingLeft:30,
+        backgroundColor:'#A8A8A8'
     }
 })
 

@@ -1,15 +1,17 @@
 import {getAuth } from 'firebase/auth';
 import React, { useEffect ,useState} from 'react';
-import {View, StyleSheet, Text, TextInput, Button, FlatList, TouchableOpacity, ToastAndroid} from 'react-native';
+import {View, StyleSheet, Text, TextInput, FlatList, TouchableOpacity, ToastAndroid} from 'react-native';
 import { FIREBASE_DB } from '../firebaseConfig';
 import {doc,getDocs,query,where,documentId,setDoc,getDoc, collection, addDoc, orderBy, serverTimestamp, updateDoc, increment,  } from 'firebase/firestore';
 
+import { Input, Icon } from '@rneui/themed';
+import { Button } from '@rneui/base';
 const ChatScreen = ({route}) => {
 
     const auth = getAuth();
     const currentUid = auth.currentUser.uid;
     const db = FIREBASE_DB;
-    const {id,type }= route.params;
+    const {id,type, userName }= route.params;
     const docId = currentUid+'_'+id;
     const docId2 = id+'_'+currentUid;
     const [loading, setLoading] = useState(false);
@@ -193,7 +195,7 @@ const updateUserID = async() => {
     },[]);
     return (
         <View style={styles.container}>
-             <Text>{currentUid} {id}</Text>
+             <Text style={{fontWeight:'bold',fontSize:20}}> {userName}</Text>
             
            {!loading? <FlatList 
                 data={allMessages}
@@ -203,9 +205,24 @@ const updateUserID = async() => {
                     </TouchableOpacity>
                 )}
             />: null}
-            <TextInput value={message} placeholder='Enter text to send' onChangeText={(message) => setMessage(message)}
-            />
-            <Button title='Send' onPress={addMessageCollection}/>
+            <Input value={message} placeholder='Enter text to send' onChangeText={(message) => setMessage(message)}/>
+            {/* <TextInput value={message} placeholder='Enter text to send' onChangeText={(message) => setMessage(message)}
+            /> */}
+            <Button
+              title="Send"
+              loading={false}
+              loadingProps={{ size: 'small', color: 'white' }}
+              buttonStyle={{
+                backgroundColor: 'rgba(111, 202, 186, 1)',
+                borderRadius: 5,
+              }}
+              titleStyle={{ fontWeight: 'bold', fontSize: 20 }}
+              containerStyle={{
+                marginHorizontal: 40,
+                height: 40,
+                width: 200,
+                marginVertical: 10,
+              }} onPress={addMessageCollection}/>
         </View>
     );
 }
@@ -215,12 +232,12 @@ const styles = StyleSheet.create({
     container:{
 
         flex:1,
-        justifyContent:'center',
         marginHorizontal:20,
-        marginTop:100,
+        marginTop:70,
     },
     senderContainer:{
-        borderWidth:2
+        borderWidth:2,
+        backgroundColor:'green'
     }
 })
 
