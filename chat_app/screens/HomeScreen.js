@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {View, StyleSheet, Text, Button, TouchableOpacity, FlatList, SafeAreaView} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native'
+import {View,Alert,BackHandler, StyleSheet, Text, Button, TouchableOpacity, FlatList, SafeAreaView} from 'react-native';
+import {useFocusEffect,useIsFocused} from '@react-navigation/native'
 import { collection,get, doc ,getDocs, query, onSnapshot, where, orderBy } from "firebase/firestore"; 
 import { FIREBASE_DB } from '../firebaseConfig';
 import { getAuth } from 'firebase/auth';
@@ -73,11 +73,23 @@ const HomeScreen = ({navigation}) => {
         }
     }
 
+    const isFocus = useIsFocused();
     useEffect(() => {
 
         console.log('inside useffect');
         getUsers();
-    },[]);
+        const backAction = () => {
+            getUsers();
+          };
+      
+          const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+          );
+      
+          return () => backHandler.remove();
+        
+    },[userList]);
     // useEffect(() => {
     //     const unsubscribe = navigation.addListener('focus', () => {
     //       // The screen is focused
