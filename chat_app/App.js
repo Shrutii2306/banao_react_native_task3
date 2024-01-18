@@ -7,6 +7,7 @@ import HomeScreen from './screens/HomeScreen';
 import ChatScreen from './screens/ChatScreen';
 import { onAuthStateChanged,User } from 'firebase/auth';
 import { FIREBASE_AUTH } from './firebaseConfig';
+import GroupChatScreen from './screens/GroupChatScreen';
 const Stack = createStackNavigator();
 export default function App() {
 
@@ -18,7 +19,7 @@ const InsideLayout = () =>{
      
       <Stack.Screen name='Home' component={HomeScreen} options={{headerShown:false}}/>
          <Stack.Screen name='Chat' component={ChatScreen} options={{headerShown: false}}/>
- 
+         <Stack.Screen name='GroupChat' component={GroupChatScreen} options={{headerShown: false}}/>
     </Stack.Navigator>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {View, StyleSheet, Text, Button, TouchableOpacity, FlatList, SafeAreaView} from 'react-native';
-import { collection,get, doc ,getDocs, query, onSnapshot, where } from "firebase/firestore"; 
+import { collection,get, doc ,getDocs, query, onSnapshot, where, orderBy } from "firebase/firestore"; 
 import { FIREBASE_DB } from '../firebaseConfig';
 import { getAuth } from 'firebase/auth';
 
@@ -31,9 +31,10 @@ const HomeScreen = ({navigation}) => {
         // })
         // return() => subscriber();
         try{
-            
-            const userRef = query(collection(db,"users"))
-            const querySnapshot = await getDocs(collection(db,"users"));
+            console.log('inside userrrrrrrr');
+            const userRef =(collection(db,"users"))
+            const q = query(userRef,orderBy('lastText','desc'))
+            const querySnapshot = await getDocs(q);
             console.log("querySnapshot",querySnapshot);
             querySnapshot.forEach((doc) => {
                 console.log(doc.id,"=>",doc.data());
@@ -72,7 +73,7 @@ const HomeScreen = ({navigation}) => {
                 data={userList}
                 renderItem={({item}) =>(
 
-                    <TouchableOpacity style={{height:50,borderWidth:2}} onPress={() => navigation.navigate('Chat',{id:item.uid,type : item.type})}>
+                    <TouchableOpacity style={{height:50,borderWidth:2}} onPress={item.type=='individual'?() => navigation.navigate('Chat',{id:item.uid,type : item.type}): () =>navigation.navigate('GroupChat',{id:item.uid,type : item.type})}>
                         <Text>
                             {item.type=='individual'?item.userName:item.name}
                         </Text>

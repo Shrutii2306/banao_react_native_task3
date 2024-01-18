@@ -2,8 +2,7 @@ import {getAuth } from 'firebase/auth';
 import React, { useEffect ,useState} from 'react';
 import {View, StyleSheet, Text, TextInput, Button, FlatList, TouchableOpacity, ToastAndroid} from 'react-native';
 import { FIREBASE_DB } from '../firebaseConfig';
-import {doc,getDocs,query,where,documentId,setDoc,getDoc, collection, Timestamp, addDoc, orderBy, serverTimestamp, updateDoc, increment, writeBatch } from 'firebase/firestore';
-import { logEvent } from 'firebase/analytics';
+import {doc,getDocs,query,where,documentId,setDoc,getDoc, collection, addDoc, orderBy, serverTimestamp, updateDoc, increment,  } from 'firebase/firestore';
 
 const ChatScreen = ({route}) => {
 
@@ -13,8 +12,7 @@ const ChatScreen = ({route}) => {
     const {id,type }= route.params;
     const docId = currentUid+'_'+id;
     const docId2 = id+'_'+currentUid;
-    // console.log('id',docId)
-    // console.log('id2',docId2)
+    const [loading, setLoading] = useState(false);
     const [chatWindowID, setChatWindowID] = useState('');
     const [message, setMessage] = useState('');
     const [allMessages, setAllMessages] = useState([]);
@@ -50,8 +48,9 @@ const ChatScreen = ({route}) => {
                 ),
               );
               const querySnapshot = await getDocs(q);
+              
             console.log(querySnapshot);
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(async(doc) => {
             console.log(doc.id, " => ", doc.data());
             setChatWindowID(doc.id);
             console.log(chatWindowID);
@@ -61,12 +60,44 @@ const ChatScreen = ({route}) => {
          if(f==0){
            createDB();
         }           
-        
+        // getMessageCollection();
         }catch(err){
             console.log(err.message);
         }
 
     }
+    const getMessageCollection = async() => {
+
+        setLoading(true);
+        try
+        {
+            console.log('first');
+            console.log(docId);
+            const docRef = collection(db, "messagesDB",docId,'messages')
+            const q= query(docRef, orderBy('timeStamp'));
+            let messagesRes = [];
+            const querySnapshot = await getDocs(q,orderBy("timeStamp"));
+                console.log('querySnapshot',querySnapshot);
+            querySnapshot.forEach((doc) => {
+    
+                messagesRes.push(doc.data());
+            });
+            console.log('messagesssssss',messagesRes);
+            setAllMessages(messagesRes);
+
+            console.log(allMessages);
+            
+            {allMessages.map((messageItem,index) => {
+    
+                console.log(messageItem.message)
+               
+            })}
+            setLoading(false);
+        }catch(err){
+            console.log(err.message);
+        }
+    
+     }
 
     const addMessageCollection = async() =>{
 
@@ -142,52 +173,25 @@ const updateUserID = async() => {
     }
 
 }
- const getMessageCollection = async() => {
-
-    try
-    {
-        console.log('first');
-        const docRef = collection(db, "messagesDB",chatWindowID,'messages')
-        const q= query(docRef, orderBy('timeStamp'));
-        let messagesRes = [];
-        const querySnapshot = await getDocs(q,orderBy("timeStamp"));
-            console.log('querySnapshot',querySnapshot);
-        querySnapshot.forEach((doc) => {
-
-            messagesRes.push(doc.data());
-        });
-        console.log('messagesssssss',messagesRes);
-        setAllMessages(messagesRes);
-        console.log(allMessages);
-        
-        {allMessages.map((messageItem,index) => {
-
-            console.log(messageItem.message)
-           
-        })}
-    }catch(err){
-        console.log(err.message);
-    }
-
- }
+ 
     useEffect(() => {
-
-        getMessageCollection();
+     
          getDB();
+         getMessageCollection();
         
     },[]);
     return (
         <View style={styles.container}>
              <Text>{currentUid} {id}</Text>
             
-            <FlatList 
+           {!loading? <FlatList 
                 data={allMessages}
                 renderItem={({item}) => (
                     <TouchableOpacity style={item.sender==currentUid? styles.senderContainer : styles.receiverContainer}>
                        <Text>{item.message}</Text> 
                     </TouchableOpacity>
                 )}
-            />
+            />: null}
             <TextInput value={message} placeholder='Enter text to send' onChangeText={(message) => setMessage(message)}
             />
             <Button title='Send' onPress={addMessageCollection}/>
