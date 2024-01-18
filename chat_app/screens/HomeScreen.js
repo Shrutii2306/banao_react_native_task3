@@ -32,7 +32,7 @@ const HomeScreen = ({navigation}) => {
         // return() => subscriber();
         try{
             
-            const q = query(collection(db,"users"))
+            const userRef = query(collection(db,"users"))
             const querySnapshot = await getDocs(collection(db,"users"));
             console.log("querySnapshot",querySnapshot);
             querySnapshot.forEach((doc) => {
