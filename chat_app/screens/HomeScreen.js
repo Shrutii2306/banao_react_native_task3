@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {View, StyleSheet, Text, Button, TouchableOpacity, FlatList, SafeAreaView} from 'react-native';
-import { collection,get, doc ,getDocs, query, onSnapshot } from "firebase/firestore"; 
+import { collection,get, doc ,getDocs, query, onSnapshot, where } from "firebase/firestore"; 
 import { FIREBASE_DB } from '../firebaseConfig';
 import { getAuth } from 'firebase/auth';
 
@@ -32,6 +32,7 @@ const HomeScreen = ({navigation}) => {
         // return() => subscriber();
         try{
             
+            const q = query(collection(db,"users"))
             const querySnapshot = await getDocs(collection(db,"users"));
             console.log("querySnapshot",querySnapshot);
             querySnapshot.forEach((doc) => {

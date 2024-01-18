@@ -18,8 +18,8 @@ const ChatScreen = ({route}) => {
     const [chatWindowID, setChatWindowID] = useState('');
     const [message, setMessage] = useState('');
     const [allMessages, setAllMessages] = useState([]);
-    // const [sender,setSender] = useState('');
-    // const [receiver,setReceiver] = useState('');
+     const [senderID,setSender] = useState('');
+     const [receiverID,setReceiver] = useState('');
     const createDB = async() => {
 
         console.log("inside createDB");
@@ -94,30 +94,8 @@ const ChatScreen = ({route}) => {
        });
     console.log('message db updated');
        //updating latest time stamp for user
-    //    const senderWindowRef =doc(db, "users", where('uid','==', currentUid));
+      updateUserID();
 
-    //    await updateDoc(senderWindowRef,{
-       
-    //     lastText: serverTimestamp()
-    //    });
-
-    //    console.log('sender updated')
-    //    const receiverWindowRef = doc(db, "users",where('uid','==', id));
-
-    //    await updateDoc(receiverWindowRef,{
-       
-    //     lastText: serverTimestamp()
-    //    });
-    //     console.log(activeUsers);
-    //     const batch = writeBatch(db);
-    //     const senderRef = doc(db,'users',where('uid','==',currentUid));
-    //     batch.update(senderRef,{
-    //         lastText : serverTimestamp()
-    //     })
-    //    await batch.commit(;
-
-    // 
-    
        console.log("message created using id :",res.id);
        getMessageCollection();
        setMessage('');
@@ -126,6 +104,44 @@ const ChatScreen = ({route}) => {
     }
 }
 
+const updateUserID = async() => {
+
+    try{
+        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        const userRef2 = collection(db, 'users');
+        const q = query(userRef2,where('uid','in',[currentUid,id]))
+        const userSnapshot = await getDocs(q);
+        userSnapshot.forEach((doc) => {
+ 
+         console.log(doc.id ,'=====>',doc.data());
+         if(doc.data().uid == currentUid)
+         {
+             setSender(doc.id);
+         }
+         if(doc.data().uid == id){
+             setReceiver(doc.id);
+         }
+        })
+        try{
+
+            const senderRef = doc(db,'users',senderID);
+            await updateDoc(senderRef,{
+                lastText : serverTimestamp()
+            })  
+            const receiverRef = doc(db, 'users',receiverID);
+            await updateDoc(receiverRef,{
+                lastText : serverTimestamp()
+            })
+
+            console.log('user db ')
+        }catch(err){
+            console.log(err.message);
+        }
+    }catch(err){
+        console.log(err.message);
+    }
+
+}
  const getMessageCollection = async() => {
 
     try
@@ -137,9 +153,7 @@ const ChatScreen = ({route}) => {
         const querySnapshot = await getDocs(q,orderBy("timeStamp"));
             console.log('querySnapshot',querySnapshot);
         querySnapshot.forEach((doc) => {
-            //console.log(doc.id, " => ", doc.data());
-            //setChatWindowID(doc.id);
-            //console.log(chatWindowID);
+
             messagesRes.push(doc.data());
         });
         console.log('messagesssssss',messagesRes);
